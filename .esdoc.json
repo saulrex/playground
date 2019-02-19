@@ -1,0 +1,10 @@
+{
+  "source": "./src",
+  "destination": "./docs",
+  "plugins": [
+    {"name": "esdoc-publish-markdown-plugin"},
+    {"name": "esdoc-standard-plugin"},
+    {"name": "esdoc-jsx-plugin", "option": { "enable": true } }
+  ],
+  "includes": ["\\.js(x)$"]
+}
