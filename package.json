@@ -70,7 +70,5 @@
     "react": "0.14.x || 15.x || 16.x",
     "react-dom": "0.14.x || 15.x || 16.x"
   },
-  "dependencies": {
-    "esdoc-jsx-plugin": "^1.0.0"
-  }
+  "dependencies": {}
 }
