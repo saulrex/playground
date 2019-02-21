@@ -8,6 +8,8 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const webpack = require('webpack');
 
+const getLocalIdent = require('./node_modules/css-loader/lib/getLocalIdent');
+
 const getApiPath = (api) => {
   switch (api) {
     default:
@@ -110,6 +112,11 @@ module.exports = (env = {}) => {
                 importLoaders: 2,
                 modules: true,
                 localIdentName: '[local]--[hash:base64:5]',
+                getLocalIdent: (context, localIdentName, localName, options) => {
+                  console.log((/styles/).test(context.resourcePath));
+                  return (/styles/).test(context.resourcePath) ?
+                    localName : getLocalIdent(context, localIdentName, localName, options)
+                },
               },
             },
             { loader: 'postcss-loader',
