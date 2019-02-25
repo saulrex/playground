@@ -36,9 +36,6 @@
     "classnames": "^2.2.6",
     "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
-    "cytoscape": "^3.4.2",
-    "cytoscape-cxtmenu": "^3.0.2",
-    "cytoscape-edgehandles": "^3.5.0",
     "es6-promise": "^4.2.4",
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
@@ -67,13 +64,13 @@
     "webpack": "^4.26.1",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.14"
+    "webpack-dev-server": "^3.1.14",
+    "d3": "3.5.17"
   },
   "peerDependencies": {
     "react": "0.14.x || 15.x || 16.x",
-    "react-dom": "0.14.x || 15.x || 16.x"
+    "react-dom": "0.14.x || 15.x || 16.x",
+    "d3": "3.5.x"
   },
-  "dependencies": {
-    "cytoscape-spread": "^3.0.0"
-  }
+  "dependencies": {}
 }

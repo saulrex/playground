@@ -113,7 +113,6 @@ module.exports = (env = {}) => {
                 modules: true,
                 localIdentName: '[local]--[hash:base64:5]',
                 getLocalIdent: (context, localIdentName, localName, options) => {
-                  console.log((/styles/).test(context.resourcePath));
                   return (/styles/).test(context.resourcePath) ?
                     localName : getLocalIdent(context, localIdentName, localName, options)
                 },
