@@ -91,7 +91,31 @@ module.exports = (env = {}) => {
         {
           test: /\.(js|jsx)$/,
           exclude: /node_modules/,
-          use: ['babel-loader'],
+          use: [{
+            loader: 'babel-loader',
+            options: {
+              "presets": [
+                "@babel/preset-env",
+                "@babel/preset-react"
+              ],
+              "plugins": [
+                "react-hot-loader/babel",
+                "es6-promise",
+                "@babel/plugin-proposal-object-rest-spread",
+                "@babel/plugin-syntax-dynamic-import",
+                "@babel/plugin-proposal-class-properties",
+                [
+                  "import",
+                  {
+                    "libraryName": "lodash",
+                    "libraryDirectory": "",
+                    "camel2DashComponentName": false
+                  }, "lodash"
+                ],
+                "@babel/plugin-transform-react-jsx-source"
+              ]
+            }
+          }],
         }, {
           test: /\.(jpe?g|png|gif|svg)$/,
           use: {
