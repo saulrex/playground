@@ -20,36 +20,47 @@ import style from './style.less';
  * runApp();
  */
 const ShowTree = class extends React.PureComponent {
-  state = {
-    len: 2
+
+  static defaultProps = {
+    len: 1,
   }
 
   cyRef = React.createRef();
 
   componentDidMount() {
-    this.init(this.state.len)
+    this.init()
   }
 
-  componentDidUpdate(props, { tree, maxLen }) {
-    if (!isEqual(props.tree, { tree, maxLen })) {
-      this.tree.updateTree(props.tree);
+  componentDidUpdate({ tree }) {
+    if (!isEqual(this.props.tree, tree)) {
+      if (!this.tree) {
+        return this.init();
+      } else {
+        this.tree.updateTree(this.props.tree);
+      }
     }
+
+    this.updateTreeState();
   }
 
-  init = (curLen) => {
+  init = () => {
     this.tree = new tree({
       rootNode: this.cyRef.current,
-      treeData: this.props.tree ? this.props.tree : {}
+      treeData: this.props.tree ? this.props.tree : {},
     });
 
-    this.setState({
-      len: curLen
-    });
+    this.updateTreeState();
+  }
+
+  updateTreeState = () => {
+    this.tree.state.onClickNode = this.props.onClickNode;
   }
 
   changeLen = (len) => {
-    if (this.state.len !== len) {
-      this.init(len)
+    if (this.props.len !== len) {
+      if (typeof this.props.onChangeLen === 'function') {
+        this.props.onChangeLen(len);
+      }
     }
   }
 
@@ -59,15 +70,16 @@ const ShowTree = class extends React.PureComponent {
         {<div className={style.mtop}>
           {/*<button className={style.btnCube}>+</button>*/}
           {/*<button className={style.btnCube}>-</button>*/}
+          {!this.props.tree}
           {this.props.maxLen && <input
             type="range"
             name="points"
-            min="2"
+            min="1"
             max={this.props.maxLen}
             onChange={({ target: { value } }) => {
               this.changeLen(+value)
             }}
-            value={this.state.len}
+            value={this.props.len}
           />}
         </div>}
       </div>

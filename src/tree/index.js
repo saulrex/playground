@@ -21,8 +21,10 @@ export default class {
     //events
     dragListener: () => {},
     click: () => {},
+    //bound events
+    onClickNode: (node) => {},
     //other
-    duration: 750,
+    duration: 300,
   }
 
   // define a d3 diagonal projection for use by the node paths later on.
@@ -265,7 +267,8 @@ export default class {
         }
       }];
     }
-    var link = this.state.svgGroup.selectAll(`.${style.templink}`).data(data);
+
+    const link = this.state.svgGroup.selectAll(`.${style.templink}`).data(data);
 
     link.enter().append('path')
       .attr('class', style.templink)
@@ -279,11 +282,12 @@ export default class {
 
   // Function to center node when clicked/dropped so node doesn't get lost when collapsing/moving with large amount of children.
 
-  toStartPosition = (source) => {
+  toStartPosition = (source, toCenter) => {
     const scale = this.zoomListener.scale();
     let x = -source.y0;
     let y = -source.x0;
-    x = x * scale + this.state.viewerWidth / 10;
+
+    x = x * scale + this.state.viewerWidth / 2;
     y = y * scale + this.state.viewerHeight / 2;
     d3.select('g').transition()
       .duration(this.state.duration)
@@ -306,32 +310,8 @@ export default class {
     }
   }
 
-  updateTree = (treeData) => {
-    // Define the root
-    this.state.root = treeData;
-    // this.state.root.x0 = this.state.viewerHeight / 2;
-    // this.state.root.y0 = 0;
-
-    // Layout the tree initially and center on the root node.
-    this.update(this.state.root);
-    // this.toStartPosition(this.state.root);
-  }
-
-  constructor({ rootNode, treeData = [], onDragEnd = () => {} }) {
-
-    this.cleanup(rootNode);
-
-    // panning variables
-    const panSpeed = 200;
-    const panBoundary = 20; // Within 20px from edges will pan when dragging.
-
-    this.state.viewerWidth = rootNode.offsetWidth;
-    this.state.viewerHeight = rootNode.offsetHeight;
-
-    this.state.tree = d3.layout.tree().size([this.state.viewerHeight, this.state.viewerWidth]);
-
+  updateTree = (treeData, toStart) => {
     // A recursive helper function for performing some setup by walking through all nodes
-
     function visit(parent, visitFn, childrenFn) {
       if (!parent) return;
 
@@ -347,14 +327,39 @@ export default class {
     }
 
     // Call visit function to establish maxLabelLength
-    visit(treeData, (d) => {
+    visit(treeData, ({ name = '' }) => {
       this.state.totalNodes++;
-      this.state.maxLabelLength = Math.max(d.name.length, this.state.maxLabelLength);
-
+      this.state.maxLabelLength = Math.max(name.length, this.state.maxLabelLength);
     }, function (d) {
       return d.children && d.children.length > 0 ? d.children : null;
     });
 
+    // Define the root
+    this.state.root = treeData;
+
+    this.state.root.x0 = this.state.viewerHeight / 2;
+    this.state.root.y0 = 0;
+
+    // Layout the tree initially and center on the root node.
+    this.update(this.state.root);
+
+    if (toStart) {
+      this.toStartPosition(this.state.root);
+    }
+  }
+
+  constructor({ rootNode, treeData = [], onDragEnd = () => {} }) {
+
+    this.cleanup(rootNode);
+
+    // panning variables
+    const panSpeed = 200;
+    const panBoundary = 20; // Within 20px from edges will pan when dragging.
+
+    this.state.viewerWidth = rootNode.offsetWidth;
+    this.state.viewerHeight = rootNode.offsetHeight;
+
+    this.state.tree = d3.layout.tree().size([this.state.viewerHeight, this.state.viewerWidth]);
 
     // // sort the tree according to the node names
     //
@@ -495,11 +500,15 @@ export default class {
         if (d == self.state.root) {
           return;
         }
+
         let domNode = this;
+
         if (self.state.selectedNode) {
           onDragEnd(self.state.selectedNode);
+
           // now remove the element from the parent, and insert it into the new elements children
-          var index = self.state.draggingNode.parent.children.indexOf(self.state.draggingNode);
+          const index = self.state.draggingNode.parent.children.indexOf(self.state.draggingNode);
+
           if (index > -1) {
             self.state.draggingNode.parent.children.splice(index, 1);
           }
@@ -517,7 +526,6 @@ export default class {
           self.expand(self.state.selectedNode);
 
           // sortTree();
-          self.endDrag(domNode);
         }
 
         self.endDrag(domNode);
@@ -542,20 +550,14 @@ export default class {
       if (d3.event.defaultPrevented) return; // click suppressed
       d = toggleChildren(d);
       this.update(d);
-      this.toStartPosition(d);
-    }
+      this.toStartPosition(d, true);
+      this.state.onClickNode(d, !d._children);
+    };
 
     // Append a group which holds all nodes and which the zoom Listener can act upon.
     this.state.svgGroup = baseSvg.append('g');
 
-    // Define the root
-    this.state.root = treeData;
-    this.state.root.x0 = this.state.viewerHeight / 2;
-    this.state.root.y0 = 0;
-
-    // Layout the tree initially and center on the root node.
-    this.update(this.state.root);
-    this.toStartPosition(this.state.root);
+    this.updateTree(treeData,true);
   }
 }
 
