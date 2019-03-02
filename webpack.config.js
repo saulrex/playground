@@ -63,7 +63,7 @@ module.exports = (env = {}) => {
       path: path.resolve(__dirname, CONTENT_DIR_NAME),
       publicPath: '/',
       filename: FILE_NAME,
-      chunkFilename: `chunk.[name].[${hash}].js`,
+      // chunkFilename: `chunk.[name].[${hash}].js`,
       library: 'showTree',
       libraryTarget: 'umd',
       umdNamedDefine: true,

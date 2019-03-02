@@ -9,4 +9,4 @@ if (MODULE_DEVELOPMENT) {
   })
 }
 
-export default ShowTree;
+export { ShowTree };
