@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import React from 'react';
 import ReactDOM from "react-dom";
 
@@ -129,7 +130,7 @@ const Example = (ShowTree) => {
   return HOC;
 };
 
-export default () => {
+const runExample = () => {
   const WrappedShowTree = Example(ShowTree);
   const Component = hot(module)(WrappedShowTree);
 
@@ -138,3 +139,5 @@ export default () => {
     document.getElementById('root')
   );
 };
+
+runExample();

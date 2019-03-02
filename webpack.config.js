@@ -23,6 +23,7 @@ module.exports = (env = {}) => {
   const CONTENT_DIR_NAME = DEV ? 'dist' : 'lib';
   const hash = DEV ? 'hash' : 'contenthash';
   const FILE_NAME = DEV ? `main.[name].[${hash}].js` : 'index.min.js';
+  const ENTRY = DEV ? './src/example/index.jsx' : './src/index.js';
 
   console.log(chalk.green('Build to:' + CONTENT_DIR_NAME));
   console.log(chalk.red('Api path:' + API_URL));
@@ -54,10 +55,7 @@ module.exports = (env = {}) => {
   }
 
   return {
-    entry: [
-      '@babel/polyfill',
-      './src/index.jsx'
-    ],
+    entry: ENTRY,
 
     output: {
       path: path.resolve(__dirname, CONTENT_DIR_NAME),
@@ -185,6 +183,16 @@ module.exports = (env = {}) => {
           ]
         }
       ],
+    },
+
+    externals: {
+      d3: 'd3',
+      react: 'react',
+      lodash : {
+        commonjs: 'lodash',
+        amd: 'lodash',
+        root: '_' // indicates global variable
+      }
     },
 
     plugins,
