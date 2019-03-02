@@ -20,12 +20,12 @@ const getApiPath = (api) => {
 module.exports = (env = {}) => {
   const API_URL = getApiPath(env.api);
   const DEV = !env.production;
-  const CONTENT_DIR_NAME = 'public';
+  const CONTENT_DIR_NAME = DEV ? 'dist' : 'lib';
+  const hash = DEV ? 'hash' : 'contenthash';
+  const FILE_NAME = DEV ? `main.[name].[${hash}].js` : 'index.min.js';
 
   console.log(chalk.green('Build to:' + CONTENT_DIR_NAME));
   console.log(chalk.red('Api path:' + API_URL));
-
-  const hash = DEV ? 'hash' : 'contenthash';
 
   const plugins = [
     new MiniCssExtractPlugin({
@@ -56,15 +56,17 @@ module.exports = (env = {}) => {
   return {
     entry: [
       '@babel/polyfill',
-      './src/index.jsx',
+      './src/index.jsx'
     ],
 
     output: {
       path: path.resolve(__dirname, CONTENT_DIR_NAME),
       publicPath: '/',
-      // filename: `main.[name].[${hash}].js`,
-      filename: `index.js`,
+      filename: FILE_NAME,
       chunkFilename: `chunk.[name].[${hash}].js`,
+      library: 'showTree',
+      libraryTarget: 'umd',
+      umdNamedDefine: true,
     },
 
     resolve: {
@@ -135,7 +137,7 @@ module.exports = (env = {}) => {
                 minimize: true,
                 importLoaders: 2,
                 modules: true,
-                localIdentName: '[local]--[hash:base64:5]',
+                localIdentName: 'showTree[local]--[hash:base64:5]',
                 getLocalIdent: (context, localIdentName, localName, options) => {
                   return (/styles/).test(context.resourcePath) ?
                     localName : getLocalIdent(context, localIdentName, localName, options)

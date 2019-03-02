@@ -1,8 +1,8 @@
 {
   "name": "showTree",
   "version": "0.0.1",
-  "description": "",
-  "main": "public/index.js",
+  "description": "visualisation tree mini library, based on D3js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --mode production --env.production",
