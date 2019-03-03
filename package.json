@@ -44,7 +44,7 @@
     "jsdoc": "^3.5.5",
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
-    "lodash": "^4.17.11",
+    "lodash": "4.17.11",
     "mini-css-extract-plugin": "^0.4.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "postcss-loader": "^3.0.0",
@@ -70,7 +70,8 @@
   "peerDependencies": {
     "react": "0.14.x || 15.x || 16.x",
     "react-dom": "0.14.x || 15.x || 16.x",
-    "d3": "3.5.x"
+    "d3": "3.5.x",
+    "lodash": "4.17.x"
   },
   "dependencies": {}
 }

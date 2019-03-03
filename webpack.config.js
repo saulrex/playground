@@ -10,38 +10,24 @@ const webpack = require('webpack');
 
 const getLocalIdent = require('./node_modules/css-loader/lib/getLocalIdent');
 
-const getApiPath = (api) => {
-  switch (api) {
-    default:
-      return 'http://api/v1';
-  }
-};
-
 module.exports = (env = {}) => {
-  const API_URL = getApiPath(env.api);
   const DEV = !env.production;
   const CONTENT_DIR_NAME = DEV ? 'dist' : 'lib';
   const hash = DEV ? 'hash' : 'contenthash';
   const FILE_NAME = DEV ? `main.[name].[${hash}].js` : 'index.min.js';
   const ENTRY = DEV ? './src/example/index.jsx' : './src/index.js';
+  const DEVTOOL = DEV ? 'source-map' : 'inline-source-map';
 
   console.log(chalk.green('Build to:' + CONTENT_DIR_NAME));
-  console.log(chalk.red('Api path:' + API_URL));
 
   const plugins = [
     new MiniCssExtractPlugin({
-      filename: DEV ? '[name].css' : '[name].[hash].css',
-      chunkFilename: DEV ? '[id].css' : '[id].[hash].css',
+      filename: DEV ? '[name].css' : 'index.css'
     }),
     new CleanWebpackPlugin([CONTENT_DIR_NAME]),
-    new webpack.DefinePlugin({
-      API_URL: JSON.stringify(API_URL),
-      MODULE_DEVELOPMENT: DEV
-    }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: DEV ? 'development' : 'production',
     }),
-    new webpack.HashedModuleIdsPlugin()
   ];
 
   if (DEV) {
@@ -61,30 +47,14 @@ module.exports = (env = {}) => {
       path: path.resolve(__dirname, CONTENT_DIR_NAME),
       publicPath: '/',
       filename: FILE_NAME,
-      // chunkFilename: `chunk.[name].[${hash}].js`,
       library: 'showTree',
       libraryTarget: 'umd',
-      umdNamedDefine: true,
+      // umdNamedDefine: true,
     },
 
     resolve: {
       extensions: ['.js', '.jsx'],
     },
-
-    // externals: {
-    //   'react': {
-    //     'commonjs': 'react',
-    //     'commonjs2': 'react',
-    //     'amd': 'react',
-    //     'root': 'React'
-    //   },
-    //   'react-dom': {
-    //     'commonjs': 'react-dom',
-    //     'commonjs2': 'react-dom',
-    //     'amd': 'react-dom',
-    //     'root': 'ReactDOM'
-    //   }
-    // },
 
     module: {
       rules: [
@@ -104,14 +74,6 @@ module.exports = (env = {}) => {
                 "@babel/plugin-proposal-object-rest-spread",
                 "@babel/plugin-syntax-dynamic-import",
                 "@babel/plugin-proposal-class-properties",
-                [
-                  "import",
-                  {
-                    "libraryName": "lodash",
-                    "libraryDirectory": "",
-                    "camel2DashComponentName": false
-                  }, "lodash"
-                ],
                 "@babel/plugin-transform-react-jsx-source"
               ]
             }
@@ -187,17 +149,23 @@ module.exports = (env = {}) => {
 
     externals: {
       d3: 'd3',
-      react: 'react',
+      react: {
+        'commonjs': 'react',
+        'commonjs2': 'react',
+        'amd': 'react',
+        'root': 'React'
+      },
       lodash : {
         commonjs: 'lodash',
+        commonjs2: 'lodash',
         amd: 'lodash',
-        root: '_' // indicates global variable
+        root: '_'
       }
     },
 
     plugins,
 
-    devtool: 'source-map',
+    devtool: DEVTOOL,
 
     devServer: {
       // headers: {
@@ -211,12 +179,11 @@ module.exports = (env = {}) => {
     },
 
     optimization: {
-      runtimeChunk: true,
       minimizer: [
-        // new UglifyJsPlugin({
-        //   parallel: true,
-        //   sourceMap: false
-        // }),
+        new UglifyJsPlugin({
+          parallel: true,
+          sourceMap: false
+        }),
         new OptimizeCSSAssetsPlugin({})
       ]
     }
