@@ -185,10 +185,10 @@ module.exports = (env = {}) => {
 
     optimization: {
       minimizer: [
-        // new UglifyJsPlugin({
-        //   parallel: true,
-        //   sourceMap: false
-        // }),
+        new UglifyJsPlugin({
+          parallel: true,
+          sourceMap: false
+        }),
         new OptimizeCSSAssetsPlugin({})
       ]
     }
