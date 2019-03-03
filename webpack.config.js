@@ -22,13 +22,15 @@ module.exports = (env = {}) => {
 
   const plugins = [
     new MiniCssExtractPlugin({
-      filename: DEV ? '[name].css' : 'index.css'
+      filename: DEV ? '[name].css' : 'showTree.css'
     }),
     new CleanWebpackPlugin([CONTENT_DIR_NAME]),
     new webpack.EnvironmentPlugin({
       NODE_ENV: DEV ? 'development' : 'production',
     }),
   ];
+
+  let EXTERNALS;
 
   if (DEV) {
     plugins.push(
@@ -38,6 +40,22 @@ module.exports = (env = {}) => {
         hash: true,
       })
     );
+  } else {
+    EXTERNALS = {
+      d3: 'd3',
+      react: {
+        'commonjs': 'react',
+        'commonjs2': 'react',
+        'amd': 'react',
+        'root': 'React'
+      },
+      lodash : {
+        commonjs: 'lodash',
+        commonjs2: 'lodash',
+        amd: 'lodash',
+        root: '_'
+      }
+    }
   }
 
   return {
@@ -89,6 +107,7 @@ module.exports = (env = {}) => {
           },
         }, {
           test: /\.less$/,
+          exclude: DEV ? undefined : path.resolve(__dirname, 'styles'),
           use: [
             DEV ? 'style-loader' : MiniCssExtractPlugin.loader,
             {
@@ -97,7 +116,7 @@ module.exports = (env = {}) => {
                 minimize: true,
                 importLoaders: 2,
                 modules: true,
-                localIdentName: 'showTree[local]--[hash:base64:5]',
+                localIdentName: 'showTree-[local]--[hash:base64:5]',
                 getLocalIdent: (context, localIdentName, localName, options) => {
                   return (/styles/).test(context.resourcePath) ?
                     localName : getLocalIdent(context, localIdentName, localName, options)
@@ -147,21 +166,7 @@ module.exports = (env = {}) => {
       ],
     },
 
-    externals: {
-      d3: 'd3',
-      react: {
-        'commonjs': 'react',
-        'commonjs2': 'react',
-        'amd': 'react',
-        'root': 'React'
-      },
-      lodash : {
-        commonjs: 'lodash',
-        commonjs2: 'lodash',
-        amd: 'lodash',
-        root: '_'
-      }
-    },
+    externals: EXTERNALS,
 
     plugins,
 
@@ -180,10 +185,10 @@ module.exports = (env = {}) => {
 
     optimization: {
       minimizer: [
-        new UglifyJsPlugin({
-          parallel: true,
-          sourceMap: false
-        }),
+        // new UglifyJsPlugin({
+        //   parallel: true,
+        //   sourceMap: false
+        // }),
         new OptimizeCSSAssetsPlugin({})
       ]
     }
